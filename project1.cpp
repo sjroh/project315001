@@ -11,16 +11,26 @@
 using namespace std;
 
 int main(){
+	// cordinate vector
+	// path vector
+	// path length var
+	// number of nodes var
+
 	// select file START
 	// TODO!!!
 	// select file END
 
 	// open file START
 		// if first char has #, then ignore the line
-		// else 
+		// else store in the vector
 	// open file END
 
-
+	// find the path START
+	// define i is 0 which is representing current node index
+	// while path vector size is equal to total number of nodes START
+		// 
+	// while path vector size is equal to total number of nodes END
+	// find the path END
 
 
 	// FOR TDD START
