@@ -3,16 +3,18 @@
 // Due: January 30, 2015
 // Project1.cpp
 /*
-If this program shows you an error, please use the command above to compile.
 I've get the basic concept of this problem from the lecture and Wikipedia.
 The way of solving this problem is finding the shortest neighbor and keep moving on.
 Yin Qu helped me to optimize my solution.
 */
 
+
 #include <iostream>
 #include <string>
 #include <vector>
-#include <cmath>
+#include <cmath> 
+#include <sys/time.h>
+#include <regex>
 
 using namespace std;
 
@@ -26,8 +28,7 @@ vector<double> XList; // save x coordinates of given file
 vector<double> YList; // save y coordinates of given file
 vector<bool> UsedList; // save node is used or not, false = not used, true = used
 vector<vector<nodeSet>> DistanceTable; // save distance from first index node to each node
-vector<int> ShortestPath; // save the shortest path list
-double ShortestDistance; // save the shortest path distance
+
 
 vector<nodeSet> sortVector(vector<nodeSet> v) {
 	// sort a given vector v by ascending order based on nodeSet.distance and return v
@@ -56,12 +57,11 @@ vector<bool> resetUsedList(vector<bool> v) {
 	return v;
 }
 
-void printPath(vector<int> v, double d) {
-	// print out the path of node index and the distance
+void printPath(vector<int> v) {
+	// print out the path of node index
 	for (int i = 0; i < v.size(); ++i) {
 		cout << v[i] << endl;
 	}
-	cout << d << endl;
 }
 
 int putXYList() {
@@ -70,13 +70,17 @@ int putXYList() {
 	int totalNodes = 0; // total numbers of Nodes
 	string inputString; // save line by line into this var
 	bool isEOF = false;
-	while (getline (cin,inputString) && !cin.eof()) {
-		if (inputString[0] == '#'); // check the input line is a comment or not
+	regex e ("[0-9]{1,}\t[0-9]{1,}");
+	// regex_match (s,sm,e);
+	// std::cout << "string object with " << sm.size() << " matches\n";
+
+	while (getline (cin,inputString) && !isEOF) {
+		if (regex_match ( inputString.begin(), inputString.end()-1, e )) { // check the input line is a comment or not
 		// else if (inputString == "^D") { // check current input string is EOF or not
 		// 	isEOF = true;
 		// }
-		else {
-			XList.push_back(stod(inputString.substr(0, inputString.find("\t"))));
+		// else {
+			XList.push_back(stod(inputString.substr(0, inputString.find("\t")),0));
 			YList.push_back(stod(inputString.substr(inputString.find("\t") + 1)));
 			UsedList.push_back(false);
 			totalNodes ++;
@@ -88,17 +92,17 @@ int putXYList() {
 void buildDistanceTable(int totalNodes) {
 	// build Distance Table for every nodes
 	// save distance between index node to other nodes
-	double squareX; // save absolute value of difference between X coordinate
-	double squareY; // save absolute value of difference between Y coordinate
+	double absX; // save absolute value of difference between X coordinate
+	double absY; // save absolute value of difference between Y coordinate
 	for (int i = 0; i < totalNodes; ++i) {
 		vector<nodeSet> tempDistanceRow;
 		for (int j = 0; j < totalNodes; ++j) {
 			if (i != j) {
-				squareX = XList[i] - XList[j];
-				squareY = YList[i] - YList[j];
+				absX = abs(XList[i] - XList[j]);
+				absY = abs(YList[i] - YList[j]);
 				nodeSet intoTempRow;
 				intoTempRow.id = j;
-				intoTempRow.distance = sqrt((squareX * squareX) + (squareY * squareY));
+				intoTempRow.distance = sqrt((absX * absX) + (absY * absY));
 				tempDistanceRow.push_back(intoTempRow);
 			}
 		}
@@ -107,37 +111,43 @@ void buildDistanceTable(int totalNodes) {
 	}
 }
 
-void findShortestPath(int totalNodes){
-		for (int i = 0; i < totalNodes; ++i) {
-		int cnt = 1;
-		int currentNode = i;
-		double tempDistance = 0;
-		vector<int> tempPath;
-		while (cnt <= totalNodes) {
-			int j;
-			for (j = 0; UsedList[DistanceTable[currentNode][j].id]; ++j);
-			UsedList[DistanceTable[currentNode][j].id] = true;
-			tempDistance += DistanceTable[currentNode][j].distance;
-			currentNode = DistanceTable[currentNode][j].id;
-			tempPath.push_back(DistanceTable[currentNode][j].id);
-			cnt ++;
-		}
-		UsedList = resetUsedList(UsedList);
-		if (i == 0) {
-			ShortestDistance = tempDistance;
-			ShortestPath = tempPath;
-		}
-		else if (ShortestDistance > tempDistance) {
-			ShortestDistance = tempDistance;
-			ShortestPath = tempPath;
-		}
-	}
-}
-
 int main(){
-	int totalNodes = putXYList(); // put XY coordinates into vectors
-	buildDistanceTable(totalNodes); // build distance table
-	findShortestPath(totalNodes);
-	printPath(ShortestPath, ShortestDistance);
+	vector<int> shortestPath;
+	double shortestDistance;
+	int totalNodes = 0; // total number of nodes
+    // totalNodes = putXYList(); // put XY coordinates into vectors
+	string inputString = "111	24";
+	regex e ("[0-9]+\t[0-9]+$");
+	if (regex_match ( inputString, e )) {
+		cout << "TEST" ;
+	}
+
+ //    buildDistanceTable(totalNodes); // build distance table
+	// for (int i = 0; i < totalNodes; ++i) {
+	// 	int cnt = 1;
+	// 	int currentNode = i;
+	// 	double tempDistance = 0;
+	// 	vector<int> tempPath;
+	// 	while (cnt <= totalNodes) {
+	// 		int j = 0;
+	// 		for (j = 0; UsedList[DistanceTable[currentNode][j].id]; ++j);
+	// 		UsedList[DistanceTable[currentNode][j].id] = true;
+	// 		tempDistance += DistanceTable[currentNode][j].distance;
+	// 		currentNode = DistanceTable[currentNode][j].id;
+	// 		tempPath.push_back(DistanceTable[currentNode][j].id);
+	// 		cnt ++;
+	// 	}
+	// 	UsedList = resetUsedList(UsedList);
+	// 	if (i == 0) {
+	// 		shortestDistance = tempDistance;
+	// 		shortestPath = tempPath;
+	// 	}
+	// 	else if (shortestDistance > tempDistance) {
+	// 		shortestDistance = tempDistance;
+	// 		shortestPath = tempPath;
+	// 	}
+	// }
+	// printPath(shortestPath);
+	// cout << shortestDistance << endl;
 	return 0;
 }
